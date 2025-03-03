@@ -324,10 +324,7 @@ class Parser {
                     });
                 }
             } else {
-                result.instructions.push({
-                    opcode: instruction.opcode,
-                    operand: instruction.operand as number
-                });
+                result.instructions.push(instruction as Instruction);
             }
         });
 
