@@ -97,7 +97,6 @@ type TwoTokenState = 'label' | 'operand';
  * Represents an instruction in the program. (internal use only)
  */
 interface IntermediaryInstruction {
-    label?: string;
     opcode: Opcode;
     operand?: number | string;
 }
@@ -303,7 +302,6 @@ class Parser {
                 break
             } else {
                 instructions.push({
-                    label: tokens[0], // raw, no processing
                     opcode: opcode as Opcode,
                     operand: operand
                 });
