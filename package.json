@@ -31,11 +31,10 @@
   "devDependencies": {
     "@types/node": "^22.13.8",
     "eslint": "^9.21.0",
-    "tsx": "^4.19.3"
+    "tsx": "^4.19.3",
+    "typescript-eslint": "^8.26.0"
   },
   "dependencies": {
-    "color-logger": "^0.0.6",
-    "consola": "^3.4.0",
-    "typescript-eslint": "^8.26.0"
+    "consola": "^3.4.0"
   }
 }
