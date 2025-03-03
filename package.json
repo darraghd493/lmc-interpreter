@@ -1,0 +1,41 @@
+{
+  "name": "lmc-interpreter",
+  "version": "1.0.0",
+  "description": "A barebones Little Man Computing instruction-set interpreter written in TypeScript.",
+  "main": "dist/example.js",
+  "scripts": {
+    "dev": "tsx watch src",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "run": "node dist/example.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/darraghd493/lmc-interpreter.git"
+  },
+  "keywords": [
+    "lmc",
+    "little",
+    "man",
+    "computing",
+    "interpreter"
+  ],
+  "author": "darraghd493",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/darraghd493/lmc-interpreter/issues"
+  },
+  "homepage": "https://github.com/darraghd493/lmc-interpreter#readme",
+  "devDependencies": {
+    "@types/node": "^22.13.8",
+    "eslint": "^9.21.0",
+    "tsx": "^4.19.3"
+  },
+  "dependencies": {
+    "color-logger": "^0.0.6",
+    "consola": "^3.4.0",
+    "typescript-eslint": "^8.26.0"
+  }
+}
