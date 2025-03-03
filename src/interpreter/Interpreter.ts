@@ -2,6 +2,24 @@ import Instruction from "../common/Instruction";
 import Opcode, { getOpcodeName, IOCode } from "../common/Opcodes";
 import consola from "../logger";
 
+/*
+ * Represents the state of the interpreter when verbose output is enabled.
+ * 
+ * @interface InterpreterVerboseState
+* */
+interface InterpreterVerboseState {
+    accumulator: number;
+    programCounter: number;
+    instructionRegister: Opcode;
+    addressRegister: number;
+    memory: number[];
+}
+
+/**
+ * Represents the events that can be handled by the Interpreter.
+ * 
+ * @interface InterpreterEvents
+ */
 interface InterpreterEvents {
     /**
      * Called when the interpreter requires input.
@@ -27,6 +45,8 @@ interface InterpreterEvents {
      * @memberOf InterpreterEvents
      */
     onFinished(): void;
+
+    onVerbose?(state: InterpreterVerboseState): void;
 }
 
 /**
@@ -102,8 +122,14 @@ class Interpreter {
         consola.debug("Memory: " + this.memory.join(", "));
 
         while (this.step()) {
-            if (this.options.verbose) {
-                consola.debug(`Verbose: PC: ${this.programCounter}, IR: ${getOpcodeName(this.instructionRegister)}, AR: ${this.addressRegister}, ACC: ${this.accumulator}`);
+            if (this.options.verbose && this.options.events.onVerbose) {
+                this.options.events.onVerbose({
+                    accumulator: this.accumulator,
+                    programCounter: this.programCounter,
+                    instructionRegister: this.instructionRegister,
+                    addressRegister: this.addressRegister,
+                    memory: this.memory
+                });
             }
         }
 

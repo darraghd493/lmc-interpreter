@@ -31,6 +31,9 @@ const interpreter = new Interpreter({
         },
         onFinished: () => {
             console.log("> Finished!");
+        },
+        onVerbose: (state) => {
+            console.log(`> Verbose: ${JSON.stringify(state)}`);
         }
     },
     memorySize: 100
