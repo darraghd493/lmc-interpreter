@@ -80,6 +80,14 @@ interface InterpreterOptions {
      * @type {number}
      */
     memorySize: number;
+
+    /*
+     * Whether to append a halt instruction to the end of the program.
+     * 
+     * @type {boolean}
+     * @memberOf InterpreterOptions
+    * */
+    appendHalt?: boolean;
 };
 
 /*
@@ -113,9 +121,11 @@ class Interpreter {
             }
         });
 
-        this.memory[this.options.program.length] = this.encode({
-            opcode: Opcode.HLT
-        });
+        if (this.options.appendHalt) {
+            this.memory[this.options.program.length] = this.encode({
+                opcode: Opcode.HLT
+            });
+        }
 
         consola.info("Starting program execution");
         consola.debug("Program: " + this.options.program.map((instruction) => getOpcodeName(instruction.opcode) + (instruction.operand !== undefined ? " " + instruction.operand : "")).join(", "));
