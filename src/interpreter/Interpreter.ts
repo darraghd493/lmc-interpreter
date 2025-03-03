@@ -8,10 +8,44 @@ import consola from "../logger";
  * @interface InterpreterVerboseState
 * */
 interface InterpreterVerboseState {
+    /*
+     * The value of the accumulator.
+     * 
+     * @type {number}
+     * @memberOf InterpreterVerboseState
+    * */
     accumulator: number;
+
+    /*
+     * The value of the program counter.
+     * 
+     * @type {number}
+     * @memberOf InterpreterVerboseState
+     */
     programCounter: number;
+
+    /**
+     * The current instruction.
+     * 
+     * @type {Opcode}
+     * @memberOf InterpreterVerboseState
+     */
     instructionRegister: Opcode;
+
+    /*
+     * The value of the address register.
+     * 
+     * @type {number}
+     * @memberOf InterpreterVerboseState
+    * */
     addressRegister: number;
+
+    /**
+     * The memory of the interpreter.
+     * 
+     * @type {number[]}
+     * @memberOf InterpreterVerboseState
+     */
     memory: number[];
 }
 
@@ -46,7 +80,23 @@ interface InterpreterEvents {
      */
     onFinished(): void;
 
+    /**
+     * Called when the interpreter is in verbose mode to dump the state.
+     * 
+     * @param {InterpreterVerboseState} state 
+     * 
+     * @memberOf InterpreterEvents
+     */
     onVerbose?(state: InterpreterVerboseState): void;
+
+    /*
+     * Called when the interpreter logs a message.
+     * 
+     * @param {string} message The message to log.
+     * 
+     * @memberOf InterpreterEvents
+    * */
+    onLog?(message: string, debug: boolean): void;
 }
 
 /**
@@ -65,7 +115,7 @@ interface InterpreterOptions {
      * 
      * @type {boolean}
      */
-    verbose: boolean;
+    verbose?: boolean;
 
     /*
      * The events to handle during interpretation.
@@ -127,10 +177,14 @@ class Interpreter {
             });
         }
 
-        consola.info("Starting program execution");
-        consola.debug("Program: " + this.options.program.map((instruction) => getOpcodeName(instruction.opcode) + (instruction.operand !== undefined ? " " + instruction.operand : "")).join(", "));
-        consola.debug("Memory: " + this.memory.join(", "));
+        consola.log("Starting program execution", false);
+        if (this.options.events.onLog) {
+            this.options.events.onLog("Starting program execution", false);
+        }
 
+        this.debug("Program: " + this.options.program.map((instruction) => getOpcodeName(instruction.opcode) + (instruction.operand !== undefined ? " " + instruction.operand : "")).join(", "));
+        this.debug("Memory: " + this.memory.join(", "));
+        
         while (this.step()) {
             if (this.options.verbose && this.options.events.onVerbose) {
                 this.options.events.onVerbose({
@@ -143,7 +197,11 @@ class Interpreter {
             }
         }
 
-        consola.success("Finished program execution");
+        consola.success("Finished program execution", true);
+        if (this.options.events.onLog) { // Repeted due to singular use of consola info/success
+            this.options.events.onLog("Finished program execution", false);
+        }
+
         this.options.events.onFinished();
     }
 
@@ -165,59 +223,59 @@ class Interpreter {
         // Execute
         switch (this.instructionRegister) {
             case Opcode.HLT:
-                consola.debug("Halted");
+                this.debug("Halted");
                 return false;
             case Opcode.ADD:
-                consola.debug(`Performing add on ${this.accumulator} and ${this.memory[this.addressRegister]}`);
+                this.debug(`Performing add on ${this.accumulator} and ${this.memory[this.addressRegister]}`);
                 this.accumulator += this.memory[this.addressRegister];
                 break;
             case Opcode.SUB:
-                consola.debug(`Performing sub on ${this.accumulator} and ${this.memory[this.addressRegister]}`);
+                this.debug(`Performing sub on ${this.accumulator} and ${this.memory[this.addressRegister]}`);
                 this.accumulator -= this.memory[this.addressRegister];
                 break;
             case Opcode.STA:
-                consola.debug(`Storing ${this.accumulator} at ${this.addressRegister}`);
+                this.debug(`Storing ${this.accumulator} at ${this.addressRegister}`);
                 this.memory[this.addressRegister] = this.accumulator;
                 break;
             case Opcode.ERR:
                 throw new Error("ERR opcode encountered");
             case Opcode.LDA:
-                consola.debug(`Loading ${this.memory[this.addressRegister]} into accumulator, replacing ${this.accumulator}`);
+                this.debug(`Loading ${this.memory[this.addressRegister]} into accumulator, replacing ${this.accumulator}`);
                 this.accumulator = this.memory[this.addressRegister];
                 break;
             case Opcode.BRA:
-                consola.debug(`Branching to ${this.addressRegister}`);
+                this.debug(`Branching to ${this.addressRegister}`);
                 this.programCounter = this.addressRegister;
                 break;
             case Opcode.BRZ:
                 if (this.accumulator === 0) {
-                    consola.debug(`Branching to ${this.addressRegister} because accumulator is ${this.accumulator}`);
+                    this.debug(`Branching to ${this.addressRegister} because accumulator is ${this.accumulator}`);
                     this.programCounter = this.addressRegister;
                 } else {
-                    consola.debug(`Not branching to ${this.addressRegister} because accumulator is ${this.accumulator}`);
+                    this.debug(`Not branching to ${this.addressRegister} because accumulator is ${this.accumulator}`);
                 }
                 break;
             case Opcode.BRP:
                 if (this.accumulator >= 0) {
                     this.programCounter = this.addressRegister;
-                    consola.debug(`Branching to ${this.addressRegister} because accumulator is ${this.accumulator}`);
+                    this.debug(`Branching to ${this.addressRegister} because accumulator is ${this.accumulator}`);
                 } else {
-                    consola.debug(`Not branching to ${this.addressRegister} because accumulator is ${this.accumulator}`);
+                    this.debug(`Not branching to ${this.addressRegister} because accumulator is ${this.accumulator}`);
                 }
                 break;
             case Opcode.INP:
                 switch (this.addressRegister) {
                     case IOCode.INPUT:
                         this.accumulator = this.options.events.onInput();
-                        consola.debug(`Inputting ${this.accumulator} into accumulator`);
+                        this.debug(`Inputting ${this.accumulator} into accumulator`);
                         break;
                     case IOCode.OUTPUT:
                         this.options.events.onOutput(this.accumulator);
-                        consola.debug(`Outputting ${this.accumulator} from accumulator`);
+                        this.debug(`Outputting ${this.accumulator} from accumulator`);
                         break;
                     case IOCode.CHAR:
                         this.options.events.onOutput(String.fromCharCode(this.accumulator).charCodeAt(0));
-                        consola.debug(`Outputting ${this.accumulator} from accumulator as character`);
+                        this.debug(`Outputting ${this.accumulator} from accumulator as character`);
                         break;   
                 }
                 break;
@@ -244,6 +302,14 @@ class Interpreter {
             opcode: (rawInstruction & 0xFF00) >> 8,
             operand: rawInstruction & 0x00FF
         };
+    }
+
+    // Log
+    private debug(message: string) {
+        if (this.options.events.onLog && this.options.verbose) {
+            this.options.events.onLog(message, true);
+        }
+        consola.debug(message);
     }
 }
 
