@@ -41,6 +41,13 @@ interface InterpreterOptions {
     program: Instruction[];
 
     /*
+     * Whether to log verbose output.
+     * 
+     * @type {boolean}
+     */
+    verbose: boolean;
+
+    /*
      * The events to handle during interpretation.
      * 
      * @type {InterpreterEvents}
@@ -95,7 +102,9 @@ class Interpreter {
         consola.debug("Memory: " + this.memory.join(", "));
 
         while (this.step()) {
-            // Do nothing
+            if (this.options.verbose) {
+                consola.debug(`Verbose: PC: ${this.programCounter}, IR: ${getOpcodeName(this.instructionRegister)}, AR: ${this.addressRegister}, ACC: ${this.accumulator}`);
+            }
         }
 
         consola.success("Finished program execution");
