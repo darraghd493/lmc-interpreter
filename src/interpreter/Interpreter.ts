@@ -203,6 +203,9 @@ class Interpreter {
             return false;
         }
 
+        // Increment
+        this.programCounter++;
+        
         // Decode
         const instruction = this.decode(rawInstruction);
 
@@ -276,9 +279,6 @@ class Interpreter {
             default:
                 throw new Error(`Unknown opcode: ${this.instructionRegister}`);
         }
-
-        // Increment
-        this.programCounter++;
 
         return true;
     }
