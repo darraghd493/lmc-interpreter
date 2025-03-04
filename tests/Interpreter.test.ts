@@ -81,7 +81,6 @@ test('input', done => {
     interpreter.run();
 }, 500);
 
-
 test('output', done => {
     const parser = new Parser({
         program: 'out',
@@ -100,6 +99,37 @@ test('output', done => {
         events: {
             onInput: () => 0,
             onOutput: done,
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            onFinished: () => {}
+        },
+        memorySize: 100
+    });
+    interpreter.run();
+}, 500);
+
+test('output as char', (done) => {
+    const parser = new Parser({
+        program: `lda char
+otc
+hlt
+char dat 101`,
+        comments: {
+            enabled: false,
+            sequence: ''
+        },
+        splitLines: {
+            enabled: true,
+            sequence: ';'
+        }
+    });
+    const result = parser.parse();
+    const interpreter = new Interpreter({
+        program: result.instructions,
+        events: {
+            onInput: () => 0,
+            onOutput: (value: string) => {
+                done(value !== 'e');
+            },
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             onFinished: () => {}
         },

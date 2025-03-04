@@ -71,7 +71,7 @@ interface InterpreterEvents {
      * 
      * @memberOf InterpreterEvents
      */
-    onOutput(value: number): void;
+    onOutput(value: string | number): void;
 
     /**
      * Called when the interpreter has finished.
@@ -268,7 +268,7 @@ class Interpreter {
                         this.debug(`Outputting ${this.accumulator} from accumulator`);
                         break;
                     case IOCode.CHAR:
-                        this.options.events.onOutput(String.fromCharCode(this.accumulator).charCodeAt(0));
+                        this.options.events.onOutput(String.fromCharCode(this.accumulator));
                         this.debug(`Outputting ${this.accumulator} from accumulator as character`);
                         break;   
                 }
