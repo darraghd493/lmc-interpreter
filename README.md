@@ -1,6 +1,6 @@
 # lmc-interpreter
 
-This is a simple interpreter for the Little Man Computing (LMC) architecture written in Typescript.
+This is a simple interpreter/simulator for the Little Man Computing (LMC) architecture written in Typescript.
 
 **Components:**
 
