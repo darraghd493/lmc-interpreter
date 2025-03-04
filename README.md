@@ -10,8 +10,8 @@ This is a simple interpreter for the Little Man Computing (LMC) architecture wri
 ## Usage
 
 ```ts
-import Interpreter from "./interpreter/Interpreter";
-import Parser from "./parser/Parser";
+import Interpreter from "./interpreter/Interpreter"; // or: Interpreter from "lmc-interpreter"
+import Parser from "./parser/Parser"; // or: Parser from "lmc-interpreter"
 
 // Parse a program
 const parser = new Parser({
