@@ -7,6 +7,20 @@ This is a simple interpreter for the Little Man Computing (LMC) architecture wri
 - parser
 - interpreter
 
+## Installation
+
+```bash
+npm install lmc-interpreter
+```
+
+```bash
+yarn add lmc-interpreter
+```
+
+```bash
+pnpm add lmc-interpreter
+```
+
 ## Usage
 
 ```ts
