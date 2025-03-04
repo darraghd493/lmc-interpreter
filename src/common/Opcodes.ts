@@ -8,6 +8,8 @@ enum Opcode {
     ADD = 1,
     SUB = 2,
     STA = 3,
+    // eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member
+    STO = STA,
     ERR = 4,
     LDA = 5,
     BRA = 6,

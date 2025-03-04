@@ -177,7 +177,7 @@ class Interpreter {
             });
         }
 
-        consola.log("Starting program execution", false);
+        consola.log("Starting program execution");
         if (this.options.events.onLog) {
             this.options.events.onLog("Starting program execution", false);
         }
@@ -197,7 +197,7 @@ class Interpreter {
             }
         }
 
-        consola.success("Finished program execution", true);
+        consola.success("Finished program execution");
         if (this.options.events.onLog) { // Repeted due to singular use of consola info/success
             this.options.events.onLog("Finished program execution", false);
         }
