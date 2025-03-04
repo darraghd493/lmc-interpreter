@@ -45,7 +45,6 @@ const result = parser.parse();
 // Note: the memory will not be reset upon .run() calls, so you may want to create a new Interpreter instance for each program
 const interpreter = new Interpreter({
     program: result.instructions,
-    verbose: true,
     events: {
         onInput: () => {
             const input = Math.floor(Math.random() * 9) + 1;
@@ -57,10 +56,9 @@ const interpreter = new Interpreter({
         },
         onFinished: () => {
             console.log("> Finished!");
-        },
-        onVerbose: (state) => {
-            console.log(`> Verbose: ${JSON.stringify(state)}`);
         }
+        // onDump = dump per step
+        // onLog = logs/actions
     },
     memorySize: 100
 });

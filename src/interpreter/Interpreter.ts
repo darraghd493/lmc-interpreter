@@ -87,7 +87,7 @@ interface InterpreterEvents {
      * 
      * @memberOf InterpreterEvents
      */
-    onVerbose?(state: InterpreterVerboseState): void;
+    onDump?(state: InterpreterVerboseState): void;
 
     /*
      * Called when the interpreter logs a message.
@@ -96,7 +96,7 @@ interface InterpreterEvents {
      * 
      * @memberOf InterpreterEvents
     * */
-    onLog?(message: string, debug: boolean): void;
+    onLog?(message: string): void;
 }
 
 /**
@@ -109,13 +109,6 @@ interface InterpreterOptions {
      * @type {Instruction[]}
      */
     program: Instruction[];
-
-    /*
-     * Whether to log verbose output.
-     * 
-     * @type {boolean}
-     */
-    verbose?: boolean;
 
     /*
      * The events to handle during interpretation.
@@ -167,21 +160,21 @@ class Interpreter {
 
         consola.log("Starting program execution");
         if (this.options.events.onLog) {
-            this.options.events.onLog("Starting program execution", false);
+            this.options.events.onLog("Starting program execution");
         }
 
         this.debug("Program: " + this.options.program.map((instruction) => getOpcodeName(instruction.opcode) + (instruction.operand !== undefined ? " " + instruction.operand : "")).join(", "));
         this.debug("Memory: " + this.memory.join(", "));
         
         while (this.step()) {
-            if (this.options.verbose && this.options.events.onVerbose) {
-                this.options.events.onVerbose(this.state);
+            if (this.options.events.onDump) {
+                this.options.events.onDump(this.state);
             }
         }
 
         consola.success("Finished program execution");
-        if (this.options.events.onLog) { // Repeted due to singular use of consola info/success
-            this.options.events.onLog("Finished program execution", false);
+        if (this.options.events.onLog) {
+            this.options.events.onLog("Finished program execution");
         }
 
         this.options.events.onFinished();
@@ -326,8 +319,8 @@ class Interpreter {
 
     // Log
     private debug(message: string) {
-        if (this.options.events.onLog && this.options.verbose) {
-            this.options.events.onLog(message, true);
+        if (this.options.events.onLog) {
+            this.options.events.onLog(message);
         }
         consola.debug(message);
     }
