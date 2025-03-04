@@ -212,9 +212,9 @@ class Interpreter {
             return false;
         }
 
+        // Decode
         const instruction = this.decode(rawInstruction);
 
-        // Decode
         this.instructionRegister = instruction.opcode;
         if (instruction.operand !== undefined) {
             this.addressRegister = instruction.operand;
