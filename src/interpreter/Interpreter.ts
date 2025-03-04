@@ -163,6 +163,31 @@ class Interpreter {
     }
 
     public run() {
+        this.initialise();
+
+        consola.log("Starting program execution");
+        if (this.options.events.onLog) {
+            this.options.events.onLog("Starting program execution", false);
+        }
+
+        this.debug("Program: " + this.options.program.map((instruction) => getOpcodeName(instruction.opcode) + (instruction.operand !== undefined ? " " + instruction.operand : "")).join(", "));
+        this.debug("Memory: " + this.memory.join(", "));
+        
+        while (this.step()) {
+            if (this.options.verbose && this.options.events.onVerbose) {
+                this.options.events.onVerbose(this.state);
+            }
+        }
+
+        consola.success("Finished program execution");
+        if (this.options.events.onLog) { // Repeted due to singular use of consola info/success
+            this.options.events.onLog("Finished program execution", false);
+        }
+
+        this.options.events.onFinished();
+    }
+
+    public initialise() {
         this.options.program.forEach((instruction, index) => {
             if (instruction.opcode === Opcode.DAT) {
                 this.memory[index] = instruction.operand as number;
@@ -176,33 +201,6 @@ class Interpreter {
                 opcode: Opcode.HLT
             });
         }
-
-        consola.log("Starting program execution");
-        if (this.options.events.onLog) {
-            this.options.events.onLog("Starting program execution", false);
-        }
-
-        this.debug("Program: " + this.options.program.map((instruction) => getOpcodeName(instruction.opcode) + (instruction.operand !== undefined ? " " + instruction.operand : "")).join(", "));
-        this.debug("Memory: " + this.memory.join(", "));
-        
-        while (this.step()) {
-            if (this.options.verbose && this.options.events.onVerbose) {
-                this.options.events.onVerbose({
-                    accumulator: this.accumulator,
-                    programCounter: this.programCounter,
-                    instructionRegister: this.instructionRegister,
-                    addressRegister: this.addressRegister,
-                    memory: this.memory
-                });
-            }
-        }
-
-        consola.success("Finished program execution");
-        if (this.options.events.onLog) { // Repeted due to singular use of consola info/success
-            this.options.events.onLog("Finished program execution", false);
-        }
-
-        this.options.events.onFinished();
     }
 
     public step(): boolean {
@@ -290,6 +288,28 @@ class Interpreter {
         this.programCounter++;
 
         return true;
+    }
+
+    public wipe() {
+        this.accumulator = 0;
+        this.programCounter = 0;
+        this.instructionRegister = 0;
+        this.addressRegister = 0;
+        this.memory = new Array(this.options.memorySize).fill(0);
+    }
+
+    get state(): InterpreterVerboseState {
+        return {
+            accumulator: this.accumulator,
+            programCounter: this.programCounter,
+            instructionRegister: this.instructionRegister,
+            addressRegister: this.addressRegister,
+            memory: this.memory
+        };
+    }
+
+    get memoryDump(): string {
+        return this.memory.join(", ");
     }
 
     // Instruction
